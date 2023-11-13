@@ -1,0 +1,13 @@
+.cache/
+.idea/
+.vs/
+.vscode/
+Vicsek_model.sln
+build/
+cmake-build-*/
+CMakeUserPresets.json
+x64/
+include/
+lib/
+Vicsek_model/Debug/
+Vicsek_model/x64/
