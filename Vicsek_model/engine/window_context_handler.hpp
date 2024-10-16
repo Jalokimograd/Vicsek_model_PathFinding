@@ -16,6 +16,7 @@ public:
         : m_window(window)
         , m_viewport_handler(toVector2f(window.getSize()))
     {
+        loadFont("adventpro-regular", "E:/Dane/Programy/C++/_SIMULATORS/Vicsek_model/res/adventpro-regular.ttf");
     }
 
     void setFocus(sf::Vector2f focus)
@@ -50,6 +51,33 @@ public:
             m_viewport_handler.wheelZoom(e.mouseWheelScroll.delta);
         });
     }
+
+    bool loadFont(const std::string& id, const std::string& filePath) {
+        if (fonts.find(id) != fonts.end()) {
+            std::cerr << "Font with ID '" << id << "' already exists." << std::endl;
+            return false;
+        }
+
+        sf::Font font;
+        if (!font.loadFromFile(filePath)) {
+            std::cerr << "Failed to load font from file: " << filePath << std::endl;
+            return false;
+        }
+
+        fonts[id] = std::move(font);
+        return true;
+    }
+
+    sf::Font& getFont(const std::string& id) {
+        auto it = fonts.find(id);
+        if (it != fonts.end()) {
+            return it->second;
+        }
+        else {
+            std::cerr << "Font with ID '" << id << "' not found." << std::endl;
+            throw std::runtime_error("Font not found: " + id);
+        }
+    }
     
     void drawDirect(const sf::Drawable& drawable)
     {
@@ -80,6 +108,7 @@ public:
 private:
     sf::RenderWindow& m_window;
     ViewportHandler m_viewport_handler;
+    std::map<std::string, sf::Font> fonts;
     
     friend class WindowContextHandler;
 };

@@ -1,6 +1,7 @@
 #pragma once
 #include "collision_grid.hpp"
 #include "physic_object.hpp"
+#include "environment.hpp"
 
 #include "../engine/common/utils.hpp"
 #include "../engine/common/index_vector.hpp"
@@ -36,16 +37,7 @@ struct PhysicSolver
         PhysicObject& obj_1 = objects.data[atom_1_idx];
         PhysicObject& obj_2 = objects.data[atom_2_idx];
 
-        const Vec2 o2_o1 = obj_1.position - obj_2.position;
-
-        const double sqrDst = o2_o1.x * o2_o1.x + o2_o1.y * o2_o1.y;
-        const double dist = sqrt(sqrDst);
-        const double view_range = grid.cell_size;
-
-        if (dist < view_range && sqrDst > eps) {
-           
-            obj_1.nextVelocity += obj_2.velocity;
-        }
+        Environment::getInstance().solveContact(obj_1, obj_2, grid.cell_size);
     }
 
 
@@ -155,9 +147,9 @@ struct PhysicSolver
     }
 
     // Add a new object to the solver
-    uint64_t createObject(Vec2 pos)
+    uint64_t createObject(Vec2 pos, char role)
     {
-        return objects.emplace_back(pos);
+        return objects.emplace_back(pos, role);
     }
 
     void update(float dt)
@@ -173,6 +165,7 @@ struct PhysicSolver
         //grid.clear();
         
         for (const PhysicObject& obj : objects.data) {
+            obj;
             grid.clear(obj.actual_grid_id);
         }
         
@@ -199,6 +192,7 @@ struct PhysicSolver
             for (uint32_t i{ start }; i < end; ++i) {
                 PhysicObject& obj = objects.data[i];
 
+                Environment::getInstance().reachingTheBaseDetection(obj);
                 obj.update(dt);
 
                 //periodic ownership of the border

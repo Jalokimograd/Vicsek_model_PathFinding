@@ -1,5 +1,6 @@
 #include "renderer.hpp"
 #include "../engine/common/time_analyzer.hpp"
+#include "../physics/environment.hpp"
 
 
 Renderer::Renderer(PhysicSolver& solver_, tp::ThreadPool& tp)
@@ -20,6 +21,20 @@ void Renderer::render(RenderContext& context)
     // Boids
     updateParticlesVA();
     context.draw(objects_va, states);
+
+    // Draw Base
+    sf::CircleShape redBase;
+    redBase.setPosition(Environment::getInstance().redBasePos.x - Environment::getInstance().baseRadius, Environment::getInstance().redBasePos.y - Environment::getInstance().baseRadius);
+    redBase.setRadius(Environment::getInstance().baseRadius);
+    redBase.setFillColor(sf::Color::Red);
+    context.draw(redBase, states);
+
+    sf::CircleShape greenBase;
+    greenBase.setPosition(Environment::getInstance().greenBasePos.x - Environment::getInstance().baseRadius, Environment::getInstance().greenBasePos.y - Environment::getInstance().baseRadius);
+    greenBase.setRadius(Environment::getInstance().baseRadius);
+    greenBase.setFillColor(sf::Color::Green);
+    context.draw(greenBase, states);
+
     renderHUD(context);
 }
 
@@ -82,12 +97,12 @@ void Renderer::renderHUD(RenderContext& context)
     const float shift  = 40.0f;
     float       current_y = margin;
     sf::Text text;
-    text.setFont(font);
+    text.setFont(context.getFont("adventpro-regular"));
     text.setCharacterSize(32);
     text.setFillColor(sf::Color::White);
     //text.setStyle(sf::Text::Bold | sf::Text::Underlined);
 
-    text.setString("Version: 1.0");
+    text.setString("Version: Vicsek + Model 2.");
     text.setPosition({ margin, current_y });
     current_y += shift;
     context.renderToHUD(text);
@@ -97,16 +112,27 @@ void Renderer::renderHUD(RenderContext& context)
     current_y += shift;
     context.renderToHUD(text);
 
+    text.setString("Noise level: " + toString(solver.objects.data[0].noise_module));
+    text.setPosition({ margin, current_y });
+    current_y += shift;
+    context.renderToHUD(text);
+
+    text.setString("View range: " + toString(5));
+    text.setPosition({ margin, current_y });
+    current_y += shift;
+    context.renderToHUD(text);
+
+
     text.setString("Simulation FPS: " + toString(TimeAnalyzer::getInstance().getFPS()) + " FPS");
     text.setPosition({ margin, current_y });
     current_y += shift;
     context.renderToHUD(text);
-
+    /*
     text.setString("Simulation Time: " + toString((int)((clock() - TimeAnalyzer::getInstance().simulation_start_time))/1000) + " s");
     text.setPosition({ margin, current_y });
     current_y += shift;
     context.renderToHUD(text);
-
+    */
     text.setString("Clear grid time: " + toString(TimeAnalyzer::getInstance().clear_grid_time) + " ms");
     text.setPosition({ margin, current_y });
     current_y += shift;

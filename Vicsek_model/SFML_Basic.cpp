@@ -37,7 +37,7 @@ int main()
     render_context.setFocus({ world_size.x * 0.5f, world_size.y * 0.5f });
 
 
-    bool pasuse = false;
+    bool pasuse = true;
     app.getEventManager().addKeyPressedCallback(sf::Keyboard::P, [&](sfev::CstEv) {
         pasuse = !pasuse;
         });
@@ -50,18 +50,61 @@ int main()
         });
 
  
-    for (uint32_t i{ 5000 }; i--;) {
+    for (uint32_t i{ 40000 }; i--;) {
         double random_x = ((double)rand() / RAND_MAX) * world_size.x;
         double random_y = ((double)rand() / RAND_MAX) * world_size.y;
 
 
-        const auto id = solver.createObject({ random_x, random_y});
+        const auto id = solver.createObject({ random_x, random_y}, 'S');
 
         solver.objects[id].velocity.x = ((double)rand() / RAND_MAX) * 10 - 5;
         solver.objects[id].velocity.y = ((double)rand() / RAND_MAX) * 10 - 5;
     }
 
+    
+    for (uint32_t i{ 130 }; i--;) {
+        for (uint32_t j{ 2 }; j--;) {
+            const auto id = solver.createObject({ 20.0 + i*2, 100.0 + j*2 }, 'O');
+            solver.objects[id].velocity.x = 1.0;
+        }
+    }
+    
+    for (uint32_t i{ 2 }; i--;) {
+        for (uint32_t j{ 100 }; j--;) {
+            const auto id = solver.createObject({ 20.0 + i * 2, 100.0 + j * 2 }, 'O');
+            solver.objects[id].velocity.x = 1.0;
+        }
+    }
+    
+    for (uint32_t i{ 2 }; i--;) {
+        for (uint32_t j{ 110 }; j--;) {
+            const auto id = solver.createObject({ 260.0 + i * 2, 30.0 + j * 2 }, 'O');
+            solver.objects[id].velocity.x = 1.0;
+        }
+    }
 
+    for (uint32_t i{ 100 }; i--;) {
+        for (uint32_t j{ 2 }; j--;) {
+            const auto id = solver.createObject({ 20.0 + i * 2, 200.0 + j * 2 }, 'O');
+            solver.objects[id].velocity.x = 1.0;
+        }
+    }
+
+
+    for (uint32_t i{ 60 }; i--;) {
+        for (uint32_t j{ 2 }; j--;) {
+            const auto id = solver.createObject({ 140.0 + i * 2, 240.0 + j * 2 }, 'O');
+            solver.objects[id].velocity.x = 1.0;
+        }
+    }
+    /*
+    for (uint32_t i{ 100 }; i--;) {
+        for (uint32_t j{ 2 }; j--;) {
+            const auto id = solver.createObject({ 20.0 + i * 2, 280.0 + j * 2 }, 'O');
+            solver.objects[id].velocity.x = 1.0;
+        }
+    }
+    */
     const float dt = 1.0f / static_cast<float>(fps_cap);
 
     clock_t time_req;

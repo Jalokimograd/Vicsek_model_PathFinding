@@ -12,10 +12,13 @@ struct PhysicObject
     Vec2 position = { 0.0, 0.0 };
     Vec2 velocity = { 0.0, 0.0 };
     Vec2 nextVelocity = { 0.0, 0.0 };
+    char nextRole = 'S';
+    char role = 'S';
+    double annealingTime = 10.0;
 
 
     double velocity_module = 50.0;
-    double noise_module = 30.0;
+    double noise_module = 10.0;
 
     sf::Color color;
 
@@ -26,9 +29,12 @@ struct PhysicObject
     PhysicObject() = default;
 
     explicit
-        PhysicObject(Vec2 position_)
-        : position(position_)
-    {}
+        PhysicObject(Vec2 position_, char role_)
+        : position(position_),
+        nextRole(role_)
+    {
+        color = sf::Color(0, 0, 0, 255);
+    }
 
     void setPosition(Vec2 pos)
     {
@@ -37,24 +43,37 @@ struct PhysicObject
 
     void update(double dt)
     {
-        velocity += nextVelocity;
+        if (role != 'O') {
 
-        velocity = normalizeVector(velocity, velocity_module);
+            
+            if (annealingTime < 0)
+                nextRole = 'S';
 
-        Vec2 noiseVector = { 0.0 , 0.0 };
-        noiseVector.x = ((double)rand() / RAND_MAX) - 0.5;
-        noiseVector.y = ((double)rand() / RAND_MAX) - 0.5;
+            if (role != 'S')
+                annealingTime -= 0.001;
+            
 
-        velocity += normalizeVector(noiseVector, noise_module);
+            velocity += nextVelocity;
 
-        velocity = normalizeVector(velocity, velocity_module);
+            velocity = normalizeVector(velocity, velocity_module);
 
-        const Vec2 new_position = position + velocity * dt;
+            Vec2 noiseVector = { 0.0 , 0.0 };
+            noiseVector.x = ((double)rand() / RAND_MAX) - 0.5;
+            noiseVector.y = ((double)rand() / RAND_MAX) - 0.5;
 
-        position = new_position;
+            velocity += normalizeVector(noiseVector, noise_module);
 
-        nextVelocity.x = 0.0;
-        nextVelocity.y = 0.0;
+            velocity = normalizeVector(velocity, velocity_module);
+
+            const Vec2 new_position = position + velocity * dt;
+
+            position = new_position;
+
+            nextVelocity.x = 0.0;
+            nextVelocity.y = 0.0;
+        }
+        if (nextRole != role)
+            roleChange(nextRole);
     }
 
     Vec2 normalizeVector(Vec2 originalVector, double vectorLength)
@@ -111,4 +130,51 @@ struct PhysicObject
 
         return color;
     }
+
+    void roleChange(char newRole) {
+        annealingTime = 1.0;
+
+        if (newRole == 'C') {
+            role = 'C';
+            color = sf::Color(255, 0, 0, 255);
+            velocity = -velocity;
+        }
+        else if (newRole == 'Z') {
+            role = 'Z';
+            color = sf::Color(0, 255, 0, 255);
+            velocity = -velocity;
+        }
+        else if (newRole == 'S') {
+            role = 'S';
+            color = sf::Color(0, 0, 0, 255);
+            velocity = -velocity;
+        }
+        else if (newRole == 'O') {
+            role = 'O';
+            color = sf::Color(255, 255, 255, 255);
+        }
+    }
 };
+
+/*
+struct Obstacle : PhysicObject {
+    char role = 'O';
+
+    sf::Color color = sf::Color(255, 255, 255, 255);
+
+    Obstacle()
+    {
+        // Inicjalizacje domyœlne, jeœli s¹ potrzebne
+    }
+
+    explicit Obstacle(Vec2 position_)
+        : PhysicObject(position_)  // Wywo³anie konstruktora klasy bazowej
+    {
+        color = sf::Color(255, 255, 255, 255);
+    }
+
+    void update(double dt) 
+    {
+    }
+};
+*/
